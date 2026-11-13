@@ -26,8 +26,8 @@ function heading(doc: jsPDF, text: string, y: number): number {
   return y + 3;
 }
 
-export function buildWeekPdf(report: WeekReport, ownerName = ""): jsPDF {
-  const doc = new jsPDF({ unit: "mm", format: "a4" });
+/** Dibuja el resumen de un período a partir de la página actual del documento. */
+function drawReport(doc: jsPDF, report: WeekReport, ownerName: string): void {
   const tableStyle = {
     theme: "grid" as const,
     styles: { font: "helvetica", fontSize: 10, cellPadding: 2.2, textColor: INK, lineColor: [220, 223, 228] as [number, number, number] },
@@ -128,7 +128,15 @@ export function buildWeekPdf(report: WeekReport, ownerName = ""): jsPDF {
     });
     y = nextY(doc, y) + 4;
   }
+}
 
+/** Un PDF con una sección por período, en el orden recibido (una página nueva por cada uno). */
+export function buildWeeksPdf(reports: WeekReport[], ownerName = ""): jsPDF {
+  const doc = new jsPDF({ unit: "mm", format: "a4" });
+  reports.forEach((r, i) => {
+    if (i > 0) doc.addPage();
+    drawReport(doc, r, ownerName);
+  });
   const pages = doc.getNumberOfPages();
   for (let i = 1; i <= pages; i++) {
     doc.setPage(i);
@@ -141,6 +149,17 @@ export function buildWeekPdf(report: WeekReport, ownerName = ""): jsPDF {
   return doc;
 }
 
+export function buildWeekPdf(report: WeekReport, ownerName = ""): jsPDF {
+  return buildWeeksPdf([report], ownerName);
+}
+
 export function weekPdfFilename(report: WeekReport): string {
   return `seguimiento-semana-${report.start}.pdf`;
+}
+
+export function weeksPdfFilename(reports: WeekReport[]): string {
+  const first = reports[0];
+  const last = reports[reports.length - 1];
+  if (!first || !last || reports.length === 1) return first ? weekPdfFilename(first) : "seguimiento.pdf";
+  return `seguimiento-${first.start}-a-${last.end}.pdf`;
 }

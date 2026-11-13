@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildWeekPdf } from "./pdf";
+import { buildWeekPdf, buildWeeksPdf, weeksPdfFilename } from "./pdf";
 import { fmt, fmtDelta } from "./format";
 import { buildWeekReport } from "./weekly";
 import { buildSeed } from "../db/seed";
@@ -44,6 +44,14 @@ describe("PDF semanal", () => {
     const bytes = doc.output("arraybuffer");
     expect(new TextDecoder("latin1").decode(bytes.slice(0, 5))).toBe("%PDF-");
     expect(doc.getNumberOfPages()).toBeGreaterThanOrEqual(1);
+  });
+
+  it("junta varias semanas en un solo PDF, una sección por semana", () => {
+    const empty = { days: [], exercises: [], sessions: [], logs: [], body: [], measureNames: ["Cintura"] };
+    const reports = ["2026-10-26", "2026-11-02", "2026-11-09"].map((w) => buildWeekReport(w, empty));
+    expect(buildWeeksPdf(reports).getNumberOfPages()).toBe(3);
+    expect(weeksPdfFilename(reports)).toBe("seguimiento-2026-10-26-a-2026-11-15.pdf");
+    expect(weeksPdfFilename(reports.slice(0, 1))).toBe("seguimiento-semana-2026-10-26.pdf");
   });
 
   it("no falla con una semana vacía", () => {
