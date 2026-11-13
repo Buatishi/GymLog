@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { addDays, formatRange, weekEnd, weekStart, weeksBetween } from "./dates";
+import { addDays, daysBetween, formatLong, formatRange, formatSpan, weekdayIndex, weekEnd, weekStart, weeksBetween } from "./dates";
 import { activeVariant, anchorFor, daysForWeek, siblingOf } from "./variants";
-import { buildWeekReport, type WeekData } from "./weekly";
+import { buildRangeReport, buildWeekReport, type WeekData } from "./weekly";
 import { parseBackup } from "./backup";
 import type { Exercise, RoutineDay } from "./types";
 
@@ -22,6 +22,14 @@ describe("fechas", () => {
   });
   it("formatea el rango", () => {
     expect(formatRange("2026-11-09")).toBe("9 nov – 15 nov");
+    expect(formatSpan("2026-11-11", "2026-11-18")).toBe("11 nov – 18 nov");
+  });
+  it("cuenta días entre fechas y da el día de la semana", () => {
+    expect(daysBetween("2026-11-09", "2026-11-15")).toBe(6);
+    expect(daysBetween("2026-11-15", "2026-11-09")).toBe(-6);
+    expect(weekdayIndex("2026-11-09")).toBe(0); // lunes
+    expect(weekdayIndex("2026-11-15")).toBe(6); // domingo
+    expect(formatLong("2026-11-12")).toBe("jueves 12 de noviembre");
   });
 });
 
@@ -153,6 +161,47 @@ describe("reporte semanal", () => {
     ];
     const m = buildWeekReport("2026-11-09", d).measures[0];
     expect(m).toEqual({ name: "Cintura", value: 92.5, previous: 94, delta: -1.5 });
+  });
+});
+
+describe("reporte de un rango libre", () => {
+  it("de miércoles a miércoles toma el máximo del rango y compara con la ventana anterior", () => {
+    const d = data();
+    d.logs = [
+      { id: "a", date: "2026-11-05", exerciseId: "remo", dayId: "d1", weightKg: 28 }, // ventana anterior (3 al 10 nov)
+      { id: "b", date: "2026-11-12", exerciseId: "remo", dayId: "d1", weightKg: 30 },
+      { id: "c", date: "2026-11-17", exerciseId: "remo", dayId: "d1", weightKg: 35 },
+      { id: "x", date: "2026-11-19", exerciseId: "remo", dayId: "d1", weightKg: 99 }, // fuera del rango
+    ];
+    const row = buildRangeReport("2026-11-11", "2026-11-18", d).blocks[0]?.rows[0];
+    expect(row?.max).toBe(35);
+    expect(row?.previous).toBe(28);
+    expect(row?.delta).toBe(7);
+  });
+
+  it("cuenta fechas entrenadas distintas, no días de rutina", () => {
+    const d = data();
+    d.sessions = [
+      { id: "1", date: "2026-11-10", dayId: "d1", done: true },
+      { id: "2", date: "2026-11-10", dayId: "d4a", done: true },
+      { id: "3", date: "2026-11-12", dayId: "d1", done: true },
+      { id: "4", date: "2026-11-13", dayId: "d1", done: false },
+    ];
+    expect(buildRangeReport("2026-11-09", "2026-11-15", d).trainedDays).toBe(2);
+  });
+
+  it("promedia el peso contra una ventana del mismo largo", () => {
+    const d = data();
+    d.body = [
+      { date: "2026-11-02", weightKg: 88, measures: {} },
+      { date: "2026-11-05", weightKg: 86, measures: {} }, // ventana anterior de 14 días: 26 oct al 8 nov
+      { date: "2026-11-12", weightKg: 85, measures: {} },
+      { date: "2026-11-20", weightKg: 83, measures: {} },
+    ];
+    const r = buildRangeReport("2026-11-09", "2026-11-22", d);
+    expect(r.avgWeight).toBe(84);
+    expect(r.previousAvgWeight).toBe(87);
+    expect(r.weightDelta).toBe(-3);
   });
 });
 

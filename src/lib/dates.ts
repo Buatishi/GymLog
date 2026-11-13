@@ -56,3 +56,32 @@ export function formatWithWeekday(iso: string): string {
 export function formatRange(start: string): string {
   return `${formatShort(start)} – ${formatShort(weekEnd(start))}`;
 }
+
+/** Cantidad de días entre dos fechas (negativa si `to` es anterior). */
+export function daysBetween(from: string, to: string): number {
+  return Math.round((parse(to) - parse(from)) / DAY_MS);
+}
+
+/** 0 = lunes … 6 = domingo. */
+export function weekdayIndex(iso: string): number {
+  return (new Date(parse(iso)).getUTCDay() + 6) % 7;
+}
+
+const WEEKDAYS_LONG = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+const MONTHS_LONG = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+
+/** "lunes 9 de noviembre" */
+export function formatLong(iso: string): string {
+  const [, m, d] = iso.split("-").map(Number) as [number, number, number];
+  return `${WEEKDAYS_LONG[new Date(parse(iso)).getUTCDay()]} ${d} de ${MONTHS_LONG[m - 1]}`;
+}
+
+/** "lun", "mar"… */
+export function weekdayShort(iso: string): string {
+  return WEEKDAYS[new Date(parse(iso)).getUTCDay()] as string;
+}
+
+/** "9 nov – 15 nov" para cualquier rango. */
+export function formatSpan(from: string, to: string): string {
+  return `${formatShort(from)} – ${formatShort(to)}`;
+}
