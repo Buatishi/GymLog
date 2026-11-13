@@ -7,7 +7,10 @@ PWA: se instala en el celular desde Chrome y los datos quedan en el propio telé
 1. **Entrenar**: arriba ves la semana (L a D) con los días que entrenaste en color; tocás un día para
    cargarlo. Elegís el día de la rutina (el día 4 muestra solo el de la semana: pierna u hombro), marcás
    que lo hiciste y anotás el peso máximo de cada ejercicio. Se guarda solo.
-2. **Cuerpo**: peso corporal y medidas (cintura por defecto; se pueden agregar más en Ajustes).
+2. **Cuerpo**: la misma tira de la semana, con dos puntos por día (peso y cintura) que se llenan al cargarlos.
+   Arriba ves si esta semana ya te pesaste y mediste (con 1 o 2 por semana alcanza). Cargás con los botones
+   − / + o escribiendo, y "Usar" repite el último valor. Abajo, la evolución por semana. La cintura es la
+   medida por defecto; se pueden agregar más en Ajustes.
 3. **Semana**: calendario de semanas y días (cada día de la rutina tiene su color). Tocás una semana,
    o dos para un rango, y ves el resumen (días entrenados, promedio de peso, máximo de cada ejercicio).
    **Compartir PDF** arma un solo archivo con una hoja por semana y abre el menú de Android (WhatsApp,

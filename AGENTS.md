@@ -20,6 +20,10 @@ armar cada semana un PDF para la nutricionista. Se usa desde el celular, instala
 - **Entrenar**: tira de la semana (L a D) con un color por número de día de la rutina; los chips de
   día muestran si y cuándo se hizo cada día esa semana. La fecha elegida vive en `App` y se comparte
   con la pestaña Semana ("Editar este día").
+- **Cuerpo**: misma tira de la semana que Entrenar, con dos marcas por día (peso y medidas). El plan
+  pide pesarse y medirse 1 o 2 veces por semana, así que el estado se mira por semana (`bodyWeekRows`):
+  "✓ n" o "Pendiente". Carga con botones −/+ (0,1 kg y 0,5 cm) que parten del último valor conocido.
+  La fecha elegida es la misma que en Entrenar (estado en `App`); no hay selector de fecha en el encabezado.
 - **Semana** (inspirada en HabitKit): calendario de semanas × días; se elige una semana o un rango de
   semanas con toques, y un **rango libre** (p. ej. miércoles a miércoles) para mirar. El PDF sale de
   semanas completas (una hoja por semana); el rango libre es solo de consulta. Tocar un día abre su
@@ -28,7 +32,6 @@ armar cada semana un PDF para la nutricionista. Se usa desde el celular, instala
   del mismo largo hacia atrás.
 
 ## Pendientes pedidos por el usuario (sin hacer)
-- Rehacer la sección **Cuerpo** (historial mejor armado). Se dejó a propósito para después.
 - Revisar el **diseño y contenido del PDF** (el usuario lo pidió para después de estos cambios).
 
 ## Opciones exploradas y NO aprobadas
