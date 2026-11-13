@@ -705,3 +705,149 @@ dialog.sheet::backdrop {
   padding: 0 12px;
   font-size: 0.9rem;
 }
+
+/* Cuerpo: marcas en la tira, estado de la semana y carga con pasos */
+.daycell.complete {
+  background: color-mix(in srgb, var(--accent) 22%, var(--field));
+}
+.marks {
+  display: flex;
+  gap: 4px;
+  margin-top: 2px;
+}
+.mk {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1.5px solid var(--muted);
+  opacity: 0.55;
+}
+.mk.on {
+  opacity: 1;
+  border-color: transparent;
+}
+.mk.w.on {
+  background: var(--d1);
+}
+.mk.m.on {
+  background: var(--d2);
+}
+.strip-legend {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 8px;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+.strip-legend span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.tile {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--card);
+  border: 1px solid var(--line);
+}
+.tile .t-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.tile b {
+  font-size: 1.15rem;
+  color: var(--muted);
+}
+.tile.ok b {
+  color: var(--accent);
+}
+.tile small {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+.card.entry {
+  gap: 8px;
+  margin: 0;
+}
+.entry-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.chipbtn {
+  min-height: 34px;
+  padding: 0 12px;
+  font-size: 0.82rem;
+  background: var(--field);
+  color: var(--accent);
+  font-weight: 600;
+}
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.stepper > button {
+  width: 56px;
+  min-height: 56px;
+  padding: 0;
+  font-size: 1.6rem;
+  flex: none;
+}
+.stepper-field {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--muted);
+}
+.stepper-field input {
+  width: 100%;
+  min-width: 0;
+  min-height: 56px;
+  text-align: center;
+  font-size: 1.7rem;
+  font-weight: 700;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--field);
+  color: var(--ink);
+  padding: 0 8px;
+}
+.stepper.bad .stepper-field input {
+  border-color: var(--danger);
+}
+.list.weeks .row {
+  padding: 8px 12px;
+}
+.wlabel {
+  width: 48px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.delta {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.delta.down {
+  color: var(--accent);
+}
+.delta.up {
+  color: var(--danger);
+}

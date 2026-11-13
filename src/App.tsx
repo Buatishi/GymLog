@@ -40,7 +40,7 @@ export function App() {
     <>
       <main>
         {tab === "train" && <TrainScreen data={data} date={trainDate} setDate={setTrainDate} />}
-        {tab === "body" && <BodyScreen data={data} />}
+        {tab === "body" && <BodyScreen data={data} date={trainDate} setDate={setTrainDate} />}
         {tab === "week" && (
           <WeekScreen
             data={data}
