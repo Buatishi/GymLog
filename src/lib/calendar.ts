@@ -13,7 +13,9 @@ export interface CalendarCell {
   dayNumber: number;
   sessions: CellSession[];
   logged: number; // cantidad de pesos cargados ese día
-  hasBody: boolean;
+  hasBody: boolean; // peso o medidas
+  hasWeight: boolean;
+  hasMeasures: boolean;
   isFuture: boolean;
   isToday: boolean;
 }
@@ -55,6 +57,8 @@ export function buildCalendar(starts: string[], data: CalendarData, today: strin
   const loggedByDate = new Map<string, number>();
   for (const l of data.logs) loggedByDate.set(l.date, (loggedByDate.get(l.date) ?? 0) + 1);
   const bodyDates = new Set(data.body.map((b) => b.date));
+  const weightDates = new Set(data.body.filter((b) => b.weightKg !== null).map((b) => b.date));
+  const measureDates = new Set(data.body.filter((b) => Object.keys(b.measures).length > 0).map((b) => b.date));
 
   return starts.map((start) => {
     const cells: CalendarCell[] = Array.from({ length: 7 }, (_, i) => {
@@ -65,6 +69,8 @@ export function buildCalendar(starts: string[], data: CalendarData, today: strin
         sessions: doneByDate.get(date) ?? [],
         logged: loggedByDate.get(date) ?? 0,
         hasBody: bodyDates.has(date),
+        hasWeight: weightDates.has(date),
+        hasMeasures: measureDates.has(date),
         isFuture: date > today,
         isToday: date === today,
       };
