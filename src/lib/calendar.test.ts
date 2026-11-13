@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { buildCalendar, recentWeekStarts, selectWeek, slotColorIndex, weekCells, weeksIn } from "./calendar";
+import { buildDayDetail } from "./dayDetail";
 import type { RoutineDay } from "./types";
 
 const day = (id: string, slot: number, name: string): RoutineDay => ({ id, slot, name, variant: null, order: slot, archived: false });
@@ -45,6 +46,45 @@ describe("calendario", () => {
 
   it("reparte colores por número de día y reinicia después del último", () => {
     expect([1, 2, 3, 4, 5, 6, 7].map(slotColorIndex)).toEqual([1, 2, 3, 4, 5, 6, 1]);
+  });
+});
+
+describe("detalle de un día", () => {
+  const exercises = [
+    { id: "e1", dayId: "d1", name: "Remo", scheme: "8-10 x 4", note: "", order: 0, archived: false },
+    { id: "e2", dayId: "d1", name: "Jalón", scheme: "8-10 x 3", note: "", order: 1, archived: false },
+    { id: "e3", dayId: "d1", name: "Viejo", scheme: "10 x 3", note: "", order: 2, archived: true },
+  ];
+  const base = { days, exercises, sessions: [], logs: [], body: [] };
+
+  it("lista los pesos cargados y cuenta los pendientes sin contar los archivados", () => {
+    const detail = buildDayDetail("2026-11-09", {
+      ...base,
+      sessions: [{ id: "s", date: "2026-11-09", dayId: "d1", done: true }],
+      logs: [
+        { id: "a", date: "2026-11-09", exerciseId: "e1", dayId: "d1", weightKg: 42.5 },
+        { id: "b", date: "2026-11-08", exerciseId: "e2", dayId: "d1", weightKg: 99 },
+      ],
+      body: [{ date: "2026-11-09", weightKg: 85.4, measures: { Cintura: 92 } }],
+    });
+    expect(detail.blocks).toHaveLength(1);
+    expect(detail.blocks[0]?.lifts).toEqual([{ name: "Remo", scheme: "8-10 x 4", weightKg: 42.5 }]);
+    expect(detail.blocks[0]?.pending).toBe(1);
+    expect(detail.body?.weightKg).toBe(85.4);
+  });
+
+  it("incluye un ejercicio archivado si tiene peso ese día", () => {
+    const detail = buildDayDetail("2026-11-09", { ...base, logs: [{ id: "c", date: "2026-11-09", exerciseId: "e3", dayId: "d1", weightKg: 10 }] });
+    expect(detail.blocks[0]?.lifts.map((l) => l.name)).toEqual(["Viejo"]);
+  });
+
+  it("un día sin registros queda vacío", () => {
+    expect(buildDayDetail("2026-11-10", base)).toEqual({ date: "2026-11-10", blocks: [], body: null });
+  });
+
+  it("un día no hecho (desmarcado) y sin pesos no aparece", () => {
+    const detail = buildDayDetail("2026-11-09", { ...base, sessions: [{ id: "s", date: "2026-11-09", dayId: "d1", done: false }] });
+    expect(detail.blocks).toEqual([]);
   });
 });
 

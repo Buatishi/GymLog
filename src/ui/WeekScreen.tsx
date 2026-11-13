@@ -1,21 +1,25 @@
 import { useMemo, useState } from "react";
 import type { AppData } from "../db/useData";
 import { buildCalendar, recentWeekStarts, selectWeek, slotColorIndex, weeksIn, type Selection } from "../lib/calendar";
-import { addDays, formatRange, formatShort, formatSpan, todayISO, weekEnd, weekStart } from "../lib/dates";
+import { addDays, daysBetween, formatRange, formatShort, formatSpan, todayISO, weekEnd, weekStart } from "../lib/dates";
 import { fmt, fmtDelta } from "../lib/format";
 import { shareOrDownload } from "../lib/share";
 import { buildRangeReport, buildWeekReport, type WeekData } from "../lib/weekly";
+import { DaySheet } from "./DaySheet";
+import { cellLabel } from "./WeekStrip";
 
 const LETTERS = ["L", "M", "X", "J", "V", "S", "D"];
 const PAGE = 10; // semanas que se muestran por vez
 
-export function WeekScreen({ data }: { data: AppData }) {
+export function WeekScreen({ data, onEditDay }: { data: AppData; onEditDay: (date: string) => void }) {
   const today = todayISO();
   const thisMonday = weekStart(today);
   const [sel, setSel] = useState<Selection>({ from: thisMonday, to: weekEnd(thisMonday) });
   const [shown, setShown] = useState(PAGE);
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
+  const [free, setFree] = useState(false);
+  const [openDate, setOpenDate] = useState<string | null>(null);
 
   const reportData: WeekData = useMemo(
     () => ({ days: data.days, exercises: data.exercises, sessions: data.sessions, logs: data.logs, body: data.body, measureNames: data.settings.measureNames }),
@@ -23,7 +27,10 @@ export function WeekScreen({ data }: { data: AppData }) {
   );
   const calendar = useMemo(() => buildCalendar(recentWeekStarts(today, shown), data, today), [data, today, shown]);
   const report = useMemo(() => buildRangeReport(sel.from, sel.to, reportData), [sel, reportData]);
-  const weeks = weeksIn(sel);
+  // El PDF se arma por semanas completas: solo se ofrece si la selección es de lunes a domingo.
+  const aligned = sel.from === weekStart(sel.from) && sel.to === weekEnd(weekStart(sel.to));
+  const weeks = aligned ? weeksIn(sel) : [];
+  const spanDays = daysBetween(sel.from, sel.to) + 1;
 
   const legend = useMemo(() => {
     const bySlot = new Map<number, string[]>();
@@ -40,6 +47,7 @@ export function WeekScreen({ data }: { data: AppData }) {
   const same = (a: Selection, b: Selection) => a.from === b.from && a.to === b.to;
 
   async function onShare() {
+    if (!aligned) return;
     setBusy(true);
     setMsg("");
     try {
@@ -55,7 +63,24 @@ export function WeekScreen({ data }: { data: AppData }) {
     }
   }
 
-  const single = weeks.length === 1;
+  const single = aligned && weeks.length === 1;
+
+  function toggleFree() {
+    if (free) {
+      // Al volver a semanas, la selección se ajusta a las semanas completas que toca.
+      setSel({ from: weekStart(sel.from), to: weekEnd(weekStart(sel.to)) });
+    } else if (sel.to > today) {
+      setSel({ from: sel.from, to: today });
+    }
+    setFree(!free);
+  }
+
+  function setFrom(v: string) {
+    if (v) setSel({ from: v, to: v > sel.to ? v : sel.to });
+  }
+  function setTo(v: string) {
+    if (v) setSel({ from: v < sel.from ? v : sel.from, to: v });
+  }
 
   return (
     <section>
@@ -66,7 +91,7 @@ export function WeekScreen({ data }: { data: AppData }) {
       <div className="card summary">
         <div>
           <div className="range">{single ? formatRange(sel.from) : formatSpan(sel.from, sel.to)}</div>
-          <div className="meta">{single ? (sel.from === thisMonday ? "esta semana" : "1 semana") : `${weeks.length} semanas`}</div>
+          <div className="meta">{!aligned ? `${spanDays} días · rango libre` : single ? (sel.from === thisMonday ? "esta semana" : "1 semana") : `${weeks.length} semanas`}</div>
         </div>
         <div className="stats">
           <div>
@@ -82,10 +107,16 @@ export function WeekScreen({ data }: { data: AppData }) {
             <span>vs. período anterior</span>
           </div>
         </div>
-        <button className="primary" onClick={onShare} disabled={busy}>
-          {busy ? "Generando…" : single ? "Compartir PDF para la nutri" : `Compartir PDF · ${weeks.length} semanas`}
-        </button>
-        {!single && <p className="hint flush">Un solo PDF con una hoja por semana.</p>}
+        {aligned ? (
+          <>
+            <button className="primary" onClick={onShare} disabled={busy}>
+              {busy ? "Generando…" : single ? "Compartir PDF para la nutri" : `Compartir PDF · ${weeks.length} semanas`}
+            </button>
+            {!single && <p className="hint flush">Un solo PDF con una hoja por semana.</p>}
+          </>
+        ) : (
+          <p className="hint flush">Este rango es solo para mirar. El PDF se arma con semanas completas (lunes a domingo).</p>
+        )}
         {msg && (
           <p className="hint flush" role="status">
             {msg}
@@ -93,14 +124,33 @@ export function WeekScreen({ data }: { data: AppData }) {
         )}
       </div>
 
-      <div className="chips" aria-label="Atajos de período">
+      <div className="chips wrap" aria-label="Atajos de período">
         {presets.map((p) => (
-          <button key={p.label} className={`chip${same(sel, p.value) ? " on" : ""}`} onClick={() => setSel(p.value)}>
+          <button key={p.label} className={`chip${same(sel, p.value) ? " on" : ""}`} onClick={() => {
+              setFree(false);
+              setSel(p.value);
+            }}>
             {p.label}
           </button>
         ))}
+        <button className={`chip${free ? " on" : ""}`} aria-pressed={free} onClick={toggleFree}>
+          Rango libre
+        </button>
       </div>
-      <p className="hint">Tocá una semana para elegirla; tocá otra para armar un rango de semanas.</p>
+      {free ? (
+        <div className="split free">
+          <label className="field">
+            Desde
+            <input type="date" value={sel.from} max={today} onChange={(e) => setFrom(e.target.value)} />
+          </label>
+          <label className="field">
+            Hasta
+            <input type="date" value={sel.to > today ? today : sel.to} max={today} onChange={(e) => setTo(e.target.value)} />
+          </label>
+        </div>
+      ) : (
+        <p className="hint">Tocá una semana para elegirla; tocá otra para armar un rango de semanas.</p>
+      )}
 
       <div className="heat" role="group" aria-label="Calendario de entrenamientos">
         <div className="heat-row head" aria-hidden="true">
@@ -111,7 +161,7 @@ export function WeekScreen({ data }: { data: AppData }) {
           <span />
         </div>
         {calendar.map((w) => {
-          const selected = w.start >= weekStart(sel.from) && w.start <= sel.to;
+          const selected = !free && w.start >= weekStart(sel.from) && w.start <= sel.to;
           return (
             <div key={w.start} className={`heat-row${selected ? " sel" : ""}`}>
               <button className="wk" aria-pressed={selected} aria-label={`Semana del ${formatRange(w.start)}`} onClick={() => setSel(selectWeek(sel, w.start))}>
@@ -119,11 +169,12 @@ export function WeekScreen({ data }: { data: AppData }) {
               </button>
               {w.cells.map((c) => {
                 const trained = c.sessions.length > 0;
-                const cls = ["hcell", trained ? `d${slotColorIndex((c.sessions[0] as { slot: number }).slot)}` : "", c.isToday ? "today" : "", c.isFuture ? "future" : ""].filter(Boolean).join(" ");
+                const inSel = free && c.date >= sel.from && c.date <= sel.to;
+                const cls = ["hcell", inSel ? "insel" : "", trained ? `d${slotColorIndex((c.sessions[0] as { slot: number }).slot)}` : "", c.isToday ? "today" : "", c.isFuture ? "future" : ""].filter(Boolean).join(" ");
                 return (
-                  <span key={c.date} className={cls}>
+                  <button key={c.date} className={cls} disabled={c.isFuture} aria-label={cellLabel(c)} onClick={() => setOpenDate(c.date)}>
                     {c.dayNumber}
-                  </span>
+                  </button>
                 );
               })}
               <span className="count">{w.trained || ""}</span>
@@ -193,6 +244,7 @@ export function WeekScreen({ data }: { data: AppData }) {
           </table>
         </div>
       ))}
+      <DaySheet date={openDate} data={data} onClose={() => setOpenDate(null)} onEdit={(d) => { setOpenDate(null); onEditDay(d); }} />
     </section>
   );
 }

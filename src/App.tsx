@@ -41,7 +41,15 @@ export function App() {
       <main>
         {tab === "train" && <TrainScreen data={data} date={trainDate} setDate={setTrainDate} />}
         {tab === "body" && <BodyScreen data={data} />}
-        {tab === "week" && <WeekScreen data={data} />}
+        {tab === "week" && (
+          <WeekScreen
+            data={data}
+            onEditDay={(d) => {
+              setTrainDate(d);
+              setTab("train");
+            }}
+          />
+        )}
         {tab === "routine" && <RoutineScreen data={data} />}
         {tab === "settings" && <SettingsScreen data={data} />}
       </main>
