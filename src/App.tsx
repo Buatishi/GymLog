@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { ensureSeed } from "./db/db";
+import { todayISO } from "./lib/dates";
 import { useData } from "./db/useData";
 import { BodyScreen } from "./ui/BodyScreen";
 import { RoutineScreen } from "./ui/RoutineScreen";
@@ -19,6 +20,7 @@ const TABS: { id: Tab; label: string; icon: string }[] = [
 
 export function App() {
   const [tab, setTab] = useState<Tab>("train");
+  const [trainDate, setTrainDate] = useState(todayISO());
   const [ready, setReady] = useState(false);
   const [error, setError] = useState("");
   const data = useData();
@@ -37,7 +39,7 @@ export function App() {
   return (
     <>
       <main>
-        {tab === "train" && <TrainScreen data={data} />}
+        {tab === "train" && <TrainScreen data={data} date={trainDate} setDate={setTrainDate} />}
         {tab === "body" && <BodyScreen data={data} />}
         {tab === "week" && <WeekScreen data={data} />}
         {tab === "routine" && <RoutineScreen data={data} />}
