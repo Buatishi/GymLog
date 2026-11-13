@@ -4,11 +4,15 @@ Registro personal de pesos del gym, peso corporal y medidas, con PDF semanal par
 PWA: se instala en el celular desde Chrome y los datos quedan en el propio teléfono.
 
 ## Cómo se usa
-1. **Entrenar**: elegís el día (el día 4 muestra solo el de la semana: pierna u hombro), marcás que lo hiciste
-   y anotás el peso máximo de cada ejercicio. Se guarda solo.
+1. **Entrenar**: arriba ves la semana (L a D) con los días que entrenaste en color; tocás un día para
+   cargarlo. Elegís el día de la rutina (el día 4 muestra solo el de la semana: pierna u hombro), marcás
+   que lo hiciste y anotás el peso máximo de cada ejercicio. Se guarda solo.
 2. **Cuerpo**: peso corporal y medidas (cintura por defecto; se pueden agregar más en Ajustes).
-3. **Semana**: vista previa del cierre (máximo de cada ejercicio, promedio de peso, medidas) y botón
-   **Compartir PDF**, que abre el menú de Android (WhatsApp, mail…).
+3. **Semana**: calendario de semanas y días (cada día de la rutina tiene su color). Tocás una semana,
+   o dos para un rango, y ves el resumen (días entrenados, promedio de peso, máximo de cada ejercicio).
+   **Compartir PDF** arma un solo archivo con una hoja por semana y abre el menú de Android (WhatsApp,
+   mail…). **Rango libre** deja mirar de cualquier fecha a cualquier fecha (por ejemplo, miércoles a
+   miércoles), solo para consultar. Tocar un día abre su detalle.
 4. **Rutina**: agregar, renombrar, reordenar o quitar días y ejercicios. Lo quitado se conserva en el historial.
 5. **Ajustes**: medidas a registrar y **backup** (guardar/restaurar un JSON).
 

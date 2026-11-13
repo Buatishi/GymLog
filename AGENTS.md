@@ -17,6 +17,20 @@ armar cada semana un PDF para la nutricionista. Se usa desde el celular, instala
 - **Reporte semanal**: semana de lunes a domingo; por ejercicio va el **máximo de la semana** sin
   decir qué día. La comparación es con la última semana que tuvo dato (por la alternancia).
 
+- **Entrenar**: tira de la semana (L a D) con un color por número de día de la rutina; los chips de
+  día muestran si y cuándo se hizo cada día esa semana. La fecha elegida vive en `App` y se comparte
+  con la pestaña Semana ("Editar este día").
+- **Semana** (inspirada en HabitKit): calendario de semanas × días; se elige una semana o un rango de
+  semanas con toques, y un **rango libre** (p. ej. miércoles a miércoles) para mirar. El PDF sale de
+  semanas completas (una hoja por semana); el rango libre es solo de consulta. Tocar un día abre su
+  detalle (`DaySheet`).
+- `buildRangeReport(start, end)` es la base de todos los resúmenes; el "anterior" se mide con ventanas
+  del mismo largo hacia atrás.
+
+## Pendientes pedidos por el usuario (sin hacer)
+- Rehacer la sección **Cuerpo** (historial mejor armado). Se dejó a propósito para después.
+- Revisar el **diseño y contenido del PDF** (el usuario lo pidió para después de estos cambios).
+
 ## Opciones exploradas y NO aprobadas
 - Supabase / sincronización entre dispositivos: no hace falta para un solo celular. Se puede sumar
   después si se pide.
@@ -40,7 +54,8 @@ node scripts/make-icons.mjs   # regenera los íconos PNG
 ```
 
 ## Mapa
-- `src/lib/` lógica pura y testeada: `dates`, `variants`, `weekly` (reporte), `pdf`, `backup`, `format`.
+- `src/lib/` lógica pura y testeada: `dates`, `variants`, `weekly` (reportes por rango), `calendar`
+  (celdas, selección de semanas), `dayDetail`, `pdf`, `backup`, `format`.
 - `src/db/` Dexie (`db.ts`), semilla de la rutina (`seed.ts`), escrituras (`actions.ts`), `useData`.
 - `src/ui/` una pantalla por pestaña: Entrenar, Cuerpo, Semana, Rutina, Ajustes.
 
