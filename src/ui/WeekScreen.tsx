@@ -11,7 +11,13 @@ import { cellLabel } from "./WeekStrip";
 const LETTERS = ["L", "M", "X", "J", "V", "S", "D"];
 const PAGE = 10; // semanas que se muestran por vez
 
-export function WeekScreen({ data, onEditDay }: { data: AppData; onEditDay: (date: string) => void }) {
+interface Props {
+  data: AppData;
+  onEditDay: (date: string) => void;
+  onEditBody: (date: string) => void;
+}
+
+export function WeekScreen({ data, onEditDay, onEditBody }: Props) {
   const today = todayISO();
   const thisMonday = weekStart(today);
   const [sel, setSel] = useState<Selection>({ from: thisMonday, to: weekEnd(thisMonday) });
@@ -244,7 +250,15 @@ export function WeekScreen({ data, onEditDay }: { data: AppData; onEditDay: (dat
           </table>
         </div>
       ))}
-      <DaySheet date={openDate} data={data} onClose={() => setOpenDate(null)} onEdit={(d) => { setOpenDate(null); onEditDay(d); }} />
+      <DaySheet date={openDate} data={data} onClose={() => setOpenDate(null)} onEdit={(d) => {
+          setOpenDate(null);
+          onEditDay(d);
+        }}
+        onEditBody={(d) => {
+          setOpenDate(null);
+          onEditBody(d);
+        }}
+      />
     </section>
   );
 }

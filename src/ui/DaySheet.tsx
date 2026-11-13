@@ -10,10 +10,11 @@ interface Props {
   data: AppData;
   onClose: () => void;
   onEdit: (date: string) => void;
+  onEditBody: (date: string) => void;
 }
 
 /** Hoja con todo lo registrado en un día. Usa <dialog>: se cierra con Esc, con el fondo o con el botón. */
-export function DaySheet({ date, data, onClose, onEdit }: Props) {
+export function DaySheet({ date, data, onClose, onEdit, onEditBody }: Props) {
   const ref = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -85,6 +86,9 @@ export function DaySheet({ date, data, onClose, onEdit }: Props) {
           <div className="actions">
             <button className="primary grow" onClick={() => date && onEdit(date)}>
               {empty ? "Cargar este día" : "Editar este día"}
+            </button>
+            <button className="ghost" onClick={() => date && onEditBody(date)}>
+              Cuerpo
             </button>
             <button className="ghost" onClick={onClose}>
               Cerrar

@@ -48,6 +48,10 @@ export function App() {
               setTrainDate(d);
               setTab("train");
             }}
+            onEditBody={(d) => {
+              setTrainDate(d);
+              setTab("body");
+            }}
           />
         )}
         {tab === "routine" && <RoutineScreen data={data} />}

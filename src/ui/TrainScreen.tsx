@@ -57,14 +57,11 @@ export function TrainScreen({ data, date, setDate }: Props) {
     <section>
       <header className="bar">
         <h1>Entrenar</h1>
-        <div className="datebox">
-          {date !== today && (
-            <button className="ghost" onClick={() => setDate(today)}>
-              Hoy
-            </button>
-          )}
-          <input type="date" aria-label="Elegir otra fecha" value={date} max={today} onChange={(e) => e.target.value && setDate(e.target.value)} />
-        </div>
+        {date !== today && (
+          <button className="ghost" onClick={() => setDate(today)}>
+            Hoy
+          </button>
+        )}
       </header>
 
       <WeekStrip

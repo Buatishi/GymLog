@@ -123,11 +123,6 @@ button.wide {
   gap: 12px;
   padding: 4px 0 12px;
 }
-.datebox {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
 input[type="date"],
 input:not([type]),
 select {
@@ -137,11 +132,6 @@ select {
   background: var(--card);
   padding: 0 12px;
   width: 100%;
-}
-.datebox input {
-  width: auto;
-  min-height: 40px;
-  font-size: 0.9rem;
 }
 .banner {
   background: var(--card);
